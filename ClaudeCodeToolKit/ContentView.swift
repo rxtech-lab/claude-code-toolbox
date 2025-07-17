@@ -18,33 +18,34 @@ struct ContentView: View {
     private let calculator = ClaudeUsageCalculator()
     
     var body: some View {
-        Group {
-            if isLoading {
-                VStack {
-                    ProgressView("Loading usage data...")
-                        .scaleEffect(1.2)
-                    Text("Analyzing Claude usage...")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 8)
+        NavigationStack {
+            Group {
+                if isLoading {
+                    VStack {
+                        ProgressView("Loading usage data...")
+                            .scaleEffect(1.2)
+                        Text("Analyzing Claude usage...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 8)
+                    }
+                } else if let errorMessage = errorMessage {
+                    ContentUnavailableView(
+                        "Error Loading Data",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(errorMessage)
+                    )
+                } else if let usage = usageData {
+                    UsageTabbedView(usage: usage)
+                } else {
+                    ContentUnavailableView(
+                        "No Usage Data",
+                        systemImage: "chart.bar",
+                        description: Text("No Claude usage data found")
+                    )
                 }
-            } else if let errorMessage = errorMessage {
-                ContentUnavailableView(
-                    "Error Loading Data",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text(errorMessage)
-                )
-            } else if let usage = usageData {
-                UsageListView(usage: usage)
-            } else {
-                ContentUnavailableView(
-                    "No Usage Data",
-                    systemImage: "chart.bar",
-                    description: Text("No Claude usage data found")
-                )
             }
         }
-        .navigationTitle("Claude Usage")
         .refreshable {
             await loadUsageData()
         }
@@ -91,11 +92,32 @@ struct ContentView: View {
     }
 }
 
-struct UsageListView: View {
+struct UsageTabbedView: View {
     let usage: UsageStatistics
     
     var body: some View {
-        List {
+        TabView {
+            UsageTextView(usage: usage)
+                .tabItem {
+                    Image(systemName: "text.alignleft")
+                    Text("Details")
+                }
+            
+            UsageChartView(usage: usage)
+                .tabItem {
+                    Image(systemName: "chart.bar")
+                    Text("Chart")
+                }
+                .padding()
+        }
+    }
+}
+
+struct UsageTextView: View {
+    let usage: UsageStatistics
+    
+    var body: some View {
+        Form {
             // Summary Section
             Section("Summary") {
                 SummaryRow(
@@ -140,17 +162,8 @@ struct UsageListView: View {
                     }
                 }
             }
-            
-            // Recent Daily Usage
-            if !usage.dailyUsage.isEmpty {
-                Section("Recent Daily Usage") {
-                    ForEach(usage.dailyUsage.prefix(7), id: \.date) { daily in
-                        DailyUsageRow(daily: daily)
-                    }
-                }
-            }
         }
-        .listStyle(.sidebar)
+        .formStyle(.grouped)
     }
 }
 

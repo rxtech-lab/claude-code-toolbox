@@ -50,7 +50,7 @@ struct MenuBarContentView: View {
                     HStack {
                         Text("Total Tokens:")
                       
-                        Text(formatNumber(stats.totalTokens))
+                        Text(stats.totalTokens.formattedTokens())
                     }
                     
                     HStack {
