@@ -67,11 +67,26 @@
 			);
 			target = DFBE4B7C2E28E4520050E565 /* ClaudeCodeUsageWidgetExtension */;
 		};
+		DFBE4BA92E28F7DE0050E565 /* Exceptions for "ClaudeCodeToolKit" folder in "ClaudeCodeUsageWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ClaudeUsage/ClaudeUsageCalculator.swift,
+				ClaudeUsage/ClaudeUsageModels.swift,
+				ClaudeUsage/CostCalculator.swift,
+				ClaudeUsage/JSONLParser.swift,
+				ClaudeUsage/UsageAggregator.swift,
+				ClaudeUsage/UsageExample.swift,
+			);
+			target = DFBE4B7C2E28E4520050E565 /* ClaudeCodeUsageWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DFBE4B4D2E28E4320050E565 /* ClaudeCodeToolKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DFBE4BA92E28F7DE0050E565 /* Exceptions for "ClaudeCodeToolKit" folder in "ClaudeCodeUsageWidgetExtension" target */,
+			);
 			path = ClaudeCodeToolKit;
 			sourceTree = "<group>";
 		};
