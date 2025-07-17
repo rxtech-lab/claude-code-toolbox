@@ -53,30 +53,12 @@ struct ContentView: View {
                 await loadUsageData()
             }
         }
-        .alert("Directory Access Required", isPresented: $showingPermissionAlert) {
-            Button("Grant Access") {
-                requestDirectoryAccess()
-            }
-            Button("Cancel", role: .cancel) {
-                errorMessage = "Directory access denied"
-            }
-        } message: {
-            Text("This app needs access to the ~/.claude directory to read your Claude usage data. You'll be prompted to select the directory.")
-        }
     }
     
     private func loadUsageData() async {
         isLoading = true
         errorMessage = nil
-        
-        await MainActor.run {
-            if !checkDirectoryAccess() {
-                self.showingPermissionAlert = true
-                self.isLoading = false
-                return
-            }
-        }
-        
+       
         do {
             let stats = try calculator.getUsageStatistics()
             await MainActor.run {
@@ -105,57 +87,6 @@ struct ContentView: View {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
             }
-        }
-    }
-    
-    private func checkDirectoryAccess() -> Bool {
-        // Check if we have a stored bookmark
-        if let bookmarkData = UserDefaults.standard.data(forKey: "claudeDirectoryBookmark") {
-            do {
-                var isStale = false
-                let url = try URL(resolvingBookmarkData: bookmarkData,
-                                  options: .withSecurityScope,
-                                  relativeTo: nil,
-                                  bookmarkDataIsStale: &isStale)
-                
-                if !isStale && url.startAccessingSecurityScopedResource() {
-                    return true
-                }
-            } catch {
-                print("Failed to resolve bookmark: \(error)")
-            }
-        }
-        
-        return false
-    }
-    
-    private func requestDirectoryAccess() {
-        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
-        let claudeDirectory = homeDirectory.appendingPathComponent(".claude")
-        let projectsDirectory = claudeDirectory.appendingPathComponent("projects")
-        
-        do {
-            // Create the .claude/projects directory if it doesn't exist
-            if !FileManager.default.fileExists(atPath: projectsDirectory.path) {
-                try FileManager.default.createDirectory(at: projectsDirectory, withIntermediateDirectories: true)
-            }
-            
-            // Create security-scoped bookmark for the .claude directory
-            let bookmarkData = try claudeDirectory.bookmarkData(
-                options: .withSecurityScope,
-                includingResourceValuesForKeys: nil,
-                relativeTo: nil
-            )
-            
-            // Store bookmark for future use
-            UserDefaults.standard.set(bookmarkData, forKey: "claudeDirectoryBookmark")
-            
-            hasDirectoryAccess = true
-            Task {
-                await loadUsageData()
-            }
-        } catch {
-            errorMessage = "Failed to create directory access: \(error.localizedDescription)"
         }
     }
 }
