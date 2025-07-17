@@ -1,12 +1,18 @@
 import Foundation
 
 class ClaudeUsageCalculator {
-    
     // MARK: - Dependencies
     
     private let parser = JSONLParser()
     private let aggregator = UsageAggregator()
-    private let costCalculator = CostCalculator()
+    private let costCalculator: CostCalculator
+    
+    init() {
+        costCalculator = CostCalculator()
+        let claude4Function = CostCalculator.claude4Pricing()
+        costCalculator.setPricingFunction(for: "claude-sonnet-4-test", pricingFunction: claude4Function)
+        costCalculator.setPricingFunction(for: "claude-opus-4-test", pricingFunction: claude4Function)
+    }
     
     // MARK: - Error Types
     
@@ -186,3 +192,5 @@ class ClaudeUsageCalculator {
         }
     }
 }
+
+// MARK: - Utility Functions

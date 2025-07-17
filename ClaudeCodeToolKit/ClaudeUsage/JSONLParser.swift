@@ -1,13 +1,29 @@
 import Foundation
 
 class JSONLParser {
-    
     // MARK: - Error Types
     
     enum JSONLParserError: Error {
         case fileNotFound
         case invalidData
         case parsingError(String)
+    }
+    
+    // MARK: - Raw Message Types
+    
+    struct RawJSONLMessage: Codable {
+        let type: String?
+        let sessionId: String?
+        let timestamp: String?
+        let cwd: String?
+        let model: String?
+        let message: MessageContent?
+    }
+    
+    struct MessageContent: Codable {
+        let role: String?
+        let model: String?
+        let usage: UsageData?
     }
     
     // MARK: - Public Methods
@@ -38,10 +54,32 @@ class JSONLParser {
                     throw JSONLParserError.invalidData
                 }
                 
-                let entry = try JSONDecoder().decode(JSONLEntry.self, from: data)
-                entries.append(entry)
+                // Parse the raw message first
+                let rawMessage = try JSONDecoder().decode(RawJSONLMessage.self, from: data)
+                
+                // Only process messages that have usage data and required fields
+                if let usage = rawMessage.message?.usage,
+                   let timestamp = rawMessage.timestamp,
+                   let cwd = rawMessage.cwd
+                {
+                    // Check for model in top level or nested in message
+                    let model = rawMessage.model ?? rawMessage.message?.model
+                    
+                    if let model = model {
+                        let entry = JSONLEntry(
+                            model: model,
+                            usage: usage,
+                            timestamp: timestamp,
+                            projectPath: cwd
+                        )
+                        entries.append(entry)
+                    }
+                }
+                
             } catch {
-                throw JSONLParserError.parsingError("Error parsing line \(index + 1): \(error.localizedDescription)")
+                // Continue parsing other lines even if one fails
+                print("Error parsing line \(index + 1): \(error)")
+                continue
             }
         }
         

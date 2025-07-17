@@ -11,7 +11,7 @@ import SwiftUI
 struct ClaudeCodeToolKitApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("No content for now")
+            ContentView()
         }
     }
 }

@@ -73,6 +73,7 @@
 				ClaudeUsage/ClaudeUsageCalculator.swift,
 				ClaudeUsage/ClaudeUsageModels.swift,
 				ClaudeUsage/CostCalculator.swift,
+				ClaudeUsage/extensions.swift,
 				ClaudeUsage/JSONLParser.swift,
 				ClaudeUsage/UsageAggregator.swift,
 				ClaudeUsage/UsageExample.swift,
