@@ -3,6 +3,7 @@ import SwiftUI
 enum MenuBarDisplayType: String, CaseIterable {
     case totalTokens = "Total Tokens"
     case monthlyCoast = "This Month Cost"
+    case todayCost = "Today Cost"
     case totalCoast = "Total Cost"
     case lastHourCost = "Last Hour Cost"
     
@@ -69,6 +70,9 @@ class MenuBarManager: ObservableObject {
         case .monthlyCoast:
             let monthlyCoast = getCurrentMonthCost()
             currentDisplayValue = "$\(String(format: "%.2f", monthlyCoast))"
+        case .todayCost:
+            let todayCost = getTodayCost()
+            currentDisplayValue = "$\(String(format: "%.2f", todayCost))"
         case .lastHourCost:
             let lastHourCost = getLastHourCost()
             currentDisplayValue = "$\(String(format: "%.2f", lastHourCost))"
@@ -84,6 +88,17 @@ class MenuBarManager: ObservableObject {
         
         let monthlyUsage = stats.monthlyUsage.first { $0.month == currentMonth }
         return monthlyUsage?.totalCost ?? 0.0
+    }
+    
+    private func getTodayCost() -> Double {
+        guard let stats = stats else { return 0.0 }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let today = dateFormatter.string(from: Date())
+        
+        let todayUsage = stats.dailyUsage.first { $0.date == today }
+        return todayUsage?.totalCost ?? 0.0
     }
     
     private func getLastHourCost() -> Double {

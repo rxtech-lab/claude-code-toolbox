@@ -49,6 +49,11 @@ struct MenuBarContentView: View {
                     }
                     
                     HStack {
+                        Text("Today:")
+                        Text("$\(String(format: "%.2f", getTodayCost(from: stats)))")
+                    }
+                    
+                    HStack {
                         Text("Last Hour:")
                         Text("$\(String(format: "%.2f", getLastHourCost(from: stats)))")
                     }
@@ -138,6 +143,15 @@ struct MenuBarContentView: View {
         
         let monthlyUsage = stats.monthlyUsage.first { $0.month == currentMonth }
         return monthlyUsage?.totalCost ?? 0.0
+    }
+    
+    private func getTodayCost(from stats: UsageStatistics) -> Double {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let today = dateFormatter.string(from: Date())
+        
+        let todayUsage = stats.dailyUsage.first { $0.date == today }
+        return todayUsage?.totalCost ?? 0.0
     }
     
     private func getLastHourCost(from stats: UsageStatistics) -> Double {

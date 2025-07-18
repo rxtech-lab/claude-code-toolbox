@@ -44,6 +44,8 @@ struct ClaudeCodeToolKitApp: App {
             return "dollarsign.circle.fill"
         case .monthlyCoast:
             return "calendar.badge.clock"
+        case .todayCost:
+            return "calendar.badge.plus"
         case .lastHourCost:
             return "clock.fill"
         }

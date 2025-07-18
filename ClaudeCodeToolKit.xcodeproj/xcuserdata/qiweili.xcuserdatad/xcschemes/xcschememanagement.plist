@@ -7,12 +7,25 @@
 		<key>ClaudeCodeToolKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<key>ClaudeCodeUsageWidgetExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>DFBE4B4A2E28E4320050E565</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DFBE4B7C2E28E4520050E565</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
