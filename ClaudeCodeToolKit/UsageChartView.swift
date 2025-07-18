@@ -75,7 +75,7 @@ struct InteractiveChart: View {
                     .foregroundStyle(Color.blue.gradient)
                 }
             }
-
+                
             // Selection rule mark
             if let selectedDate = selectedDate {
                 RuleMark(x: .value("Date", selectedDate))
@@ -83,27 +83,21 @@ struct InteractiveChart: View {
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
                     .annotation(position: .top, spacing: 0, overflowResolution: .init(
                         x: .fit(to: .chart),
-                        y: .disabled
+                        y: .fit
                     )) {
-                        if selectedPeriod == .today {
-                            if let selectedUsage = selectedHourlyUsage {
-                                HourlyChartTooltip(hourlyUsage: selectedUsage)
-                            } else {
-                                Text("No selected")
-                            }
+                        if let selectedUsage = selectedDailyUsage {
+                            ChartTooltip(dailyUsage: selectedUsage)
                         } else {
-                            if let selectedUsage = selectedDailyUsage {
-                                ChartTooltip(dailyUsage: selectedUsage)
-                            } else {
-                                Text("No selected")
-                            }
+                            Text("No selected")
                         }
                     }
             }
         }
         .frame(height: 400)
+        .frame(minWidth: max(600, CGFloat(selectedPeriod == .today ? filteredHourlyUsage.count * 40 : filteredDailyUsage.count * 40)))
         .chartXSelection(value: $selectedDate)
         .chartXScale(range: .plotDimension(padding: 0))
+        .chartScrollableAxes(.horizontal)
         .chartYAxis {
             AxisMarks(position: .leading) { value in
                 AxisGridLine()

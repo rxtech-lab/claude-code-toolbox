@@ -12,7 +12,7 @@ struct ClaudeCodeToolKitApp: App {
     @StateObject private var menuBarManager = MenuBarManager()
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             ContentView()
         }
         .commands {

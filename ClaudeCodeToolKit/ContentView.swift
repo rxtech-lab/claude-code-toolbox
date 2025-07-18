@@ -49,10 +49,8 @@ struct ContentView: View {
         .refreshable {
             await loadUsageData()
         }
-        .onAppear {
-            Task {
-                await loadUsageData()
-            }
+        .task {
+            await loadUsageData()
         }
     }
     

@@ -91,9 +91,8 @@ class MenuBarManager: ObservableObject {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH"
-        let lastHour = dateFormatter.string(from: Date().addingTimeInterval(-3600))
-        
-        let hourlyUsage = stats.hourlyUsage.first { $0.hour == lastHour }
+     
+        let hourlyUsage = stats.hourlyUsage.first
         return hourlyUsage?.totalCost ?? 0.0
     }
     

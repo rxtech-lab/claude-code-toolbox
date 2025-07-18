@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarContentView: View {
     @ObservedObject var menuBarManager: MenuBarManager
     @State private var isRefreshing = false
+    @Environment(\.openWindow) var openWindow
     
     var body: some View {
         VStack(spacing: 8) {
@@ -75,6 +76,18 @@ struct MenuBarContentView: View {
             // Actions
             VStack(spacing: 4) {
                 Button(action: {
+                    openWindow(id: "main")
+                }) {
+                    HStack {
+                        Image(systemName: "macwindow")
+                            .font(.system(size: 12))
+                        Text("Show Main App")
+                            .font(.system(size: 12))
+                    }
+                }
+                .keyboardShortcut("m")
+                
+                Button(action: {
                     isRefreshing = true
                     menuBarManager.refreshData()
                     
@@ -130,9 +143,7 @@ struct MenuBarContentView: View {
     private func getLastHourCost(from stats: UsageStatistics) -> Double {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH"
-        let lastHour = dateFormatter.string(from: Date().addingTimeInterval(-3600))
-        
-        let hourlyUsage = stats.hourlyUsage.first { $0.hour == lastHour }
+        let hourlyUsage = stats.hourlyUsage.first
         return hourlyUsage?.totalCost ?? 0.0
     }
     
