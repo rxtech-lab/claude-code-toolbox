@@ -132,6 +132,39 @@ class UsageAggregator {
         return Array(dailyStats.values).sorted { $0.date > $1.date }
     }
     
+    // MARK: - Aggregation by Hour
+    
+    func aggregateByHour(_ entries: [JSONLEntry]) -> [HourlyUsage] {
+        var hourlyStats: [String: HourlyUsage] = [:]
+        
+        for entry in entries {
+            guard let usage = entry.usage else { continue }
+            
+            let cost = costCalculator.calculateCost(for: entry.model, usage: usage)
+            let totalTokens = costCalculator.calculateTotalTokens(usage: usage)
+            
+            // Extract hour from timestamp (YYYY-MM-DD HH format)
+            let hour = String(entry.timestamp.prefix(13))
+            
+            if hourlyStats[hour] == nil {
+                hourlyStats[hour] = HourlyUsage(hour: hour)
+            }
+            
+            var hourlyStat = hourlyStats[hour]!
+            hourlyStat.totalCost += cost
+            hourlyStat.totalTokens += totalTokens
+            
+            // Track unique models used
+            if !hourlyStat.modelsUsed.contains(entry.model) {
+                hourlyStat.modelsUsed.append(entry.model)
+            }
+            
+            hourlyStats[hour] = hourlyStat
+        }
+        
+        return Array(hourlyStats.values).sorted { $0.hour > $1.hour }
+    }
+    
     // MARK: - Overall Statistics
     
     func calculateOverallStats(_ entries: [JSONLEntry]) -> (totalCost: Double, totalTokens: Int, totalSessions: Int) {
@@ -169,6 +202,7 @@ class UsageAggregator {
         let projectUsage = aggregateByProject(entries)
         let monthlyUsage = aggregateByMonth(entries)
         let dailyUsage = aggregateByDay(entries)
+        let hourlyUsage = aggregateByHour(entries)
         let overallStats = calculateOverallStats(entries)
         let dateRange = calculateDateRange(entries)
         
@@ -180,6 +214,7 @@ class UsageAggregator {
             projectUsage: projectUsage,
             monthlyUsage: monthlyUsage,
             dailyUsage: dailyUsage,
+            hourlyUsage: hourlyUsage,
             dateRange: dateRange
         )
     }

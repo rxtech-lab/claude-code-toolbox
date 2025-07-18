@@ -102,6 +102,20 @@ struct DailyUsage {
     }
 }
 
+struct HourlyUsage {
+    let hour: String // Format: "YYYY-MM-DD HH"
+    var totalCost: Double
+    var totalTokens: Int
+    var modelsUsed: [String]
+    
+    init(hour: String) {
+        self.hour = hour
+        self.totalCost = 0.0
+        self.totalTokens = 0
+        self.modelsUsed = []
+    }
+}
+
 // MARK: - Overall Usage Statistics
 
 struct UsageStatistics {
@@ -112,5 +126,6 @@ struct UsageStatistics {
     let projectUsage: [ProjectUsage]
     let monthlyUsage: [MonthlyUsage]
     let dailyUsage: [DailyUsage]
+    let hourlyUsage: [HourlyUsage]
     let dateRange: (start: String, end: String)
 }

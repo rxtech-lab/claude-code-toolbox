@@ -4,6 +4,7 @@ enum MenuBarDisplayType: String, CaseIterable {
     case totalTokens = "Total Tokens"
     case monthlyCoast = "This Month Cost"
     case totalCoast = "Total Cost"
+    case lastHourCost = "Last Hour Cost"
     
     var displayName: String {
         return rawValue
@@ -68,6 +69,9 @@ class MenuBarManager: ObservableObject {
         case .monthlyCoast:
             let monthlyCoast = getCurrentMonthCost()
             currentDisplayValue = "$\(String(format: "%.2f", monthlyCoast))"
+        case .lastHourCost:
+            let lastHourCost = getLastHourCost()
+            currentDisplayValue = "$\(String(format: "%.2f", lastHourCost))"
         }
     }
     
@@ -80,6 +84,17 @@ class MenuBarManager: ObservableObject {
         
         let monthlyUsage = stats.monthlyUsage.first { $0.month == currentMonth }
         return monthlyUsage?.totalCost ?? 0.0
+    }
+    
+    private func getLastHourCost() -> Double {
+        guard let stats = stats else { return 0.0 }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH"
+        let lastHour = dateFormatter.string(from: Date().addingTimeInterval(-3600))
+        
+        let hourlyUsage = stats.hourlyUsage.first { $0.hour == lastHour }
+        return hourlyUsage?.totalCost ?? 0.0
     }
     
     private func formatNumber(_ number: Int) -> String {
