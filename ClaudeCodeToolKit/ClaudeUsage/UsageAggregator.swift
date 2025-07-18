@@ -4,6 +4,44 @@ class UsageAggregator {
     
     private let costCalculator = CostCalculator()
     
+    // MARK: - Timezone Conversion Helper
+    
+    private func convertUTCTimestampToLocalHour(_ utcTimestamp: String) -> String {
+        // Parse UTC timestamp (format: "2025-07-18T02:48:03.470Z")
+        let iso8601Formatter = ISO8601DateFormatter()
+        iso8601Formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        guard let utcDate = iso8601Formatter.date(from: utcTimestamp) else {
+            // Fallback to simple prefix extraction if parsing fails
+            return String(utcTimestamp.prefix(13))
+        }
+        
+        // Convert to local timezone and format as "YYYY-MM-DDTHH"
+        let localFormatter = DateFormatter()
+        localFormatter.dateFormat = "yyyy-MM-dd'T'HH"
+        localFormatter.timeZone = TimeZone.current
+        
+        return localFormatter.string(from: utcDate)
+    }
+    
+    private func convertUTCTimestampToLocalDate(_ utcTimestamp: String) -> String {
+        // Parse UTC timestamp (format: "2025-07-18T02:48:03.470Z")
+        let iso8601Formatter = ISO8601DateFormatter()
+        iso8601Formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        guard let utcDate = iso8601Formatter.date(from: utcTimestamp) else {
+            // Fallback to simple prefix extraction if parsing fails
+            return String(utcTimestamp.prefix(10))
+        }
+        
+        // Convert to local timezone and format as "YYYY-MM-DD"
+        let localFormatter = DateFormatter()
+        localFormatter.dateFormat = "yyyy-MM-dd"
+        localFormatter.timeZone = TimeZone.current
+        
+        return localFormatter.string(from: utcDate)
+    }
+    
     // MARK: - Aggregation by Model
     
     func aggregateByModel(_ entries: [JSONLEntry]) -> [ModelUsage] {
@@ -110,8 +148,8 @@ class UsageAggregator {
             let cost = costCalculator.calculateCost(for: entry.model, usage: usage)
             let totalTokens = costCalculator.calculateTotalTokens(usage: usage)
             
-            // Extract date from timestamp (YYYY-MM-DD format)
-            let date = String(entry.timestamp.prefix(10))
+            // Convert UTC timestamp to local timezone date
+            let date = convertUTCTimestampToLocalDate(entry.timestamp)
             
             if dailyStats[date] == nil {
                 dailyStats[date] = DailyUsage(date: date)
@@ -143,8 +181,8 @@ class UsageAggregator {
             let cost = costCalculator.calculateCost(for: entry.model, usage: usage)
             let totalTokens = costCalculator.calculateTotalTokens(usage: usage)
             
-            // Extract hour from timestamp (YYYY-MM-DD HH format)
-            let hour = String(entry.timestamp.prefix(13))
+            // Convert UTC timestamp to local timezone hour
+            let hour = convertUTCTimestampToLocalHour(entry.timestamp)
             
             if hourlyStats[hour] == nil {
                 hourlyStats[hour] = HourlyUsage(hour: hour)
